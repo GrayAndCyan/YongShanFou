@@ -16,9 +16,31 @@
 
 ## SSE（服务发送事件）实现服务端消息主动推送
 
+用一次http请求/响应交互实现服务端主动消息推送，基于SpringMVC SseEmitter（底层使用异步请求），商家端的SSE连接请求在处理后不会立刻结束响应，响应仍处于open状态（这是由异步线程去保持的，web容器中的工作线程被归还），用户下单线程调用`sseEmitter.send(msg)`，在响应中
+写入消息，异步线程去做消息的推送。这比短轮询节省了大量的无效请求；比长轮询较少了请求数以及避免了长轮询两次轮询间消息丢失风险；相比WebSocket则对场景更适应（单向消息推送即可），并且实现更简单。
+
+```bash
+2023-11-30T12:07:48.913+08:00 DEBUG 26510 --- [nio-8081-exec-3] o.s.web.servlet.DispatcherServlet        : GET "/sse/connect?token=xxx", parameters={masked}
+2023-11-30T12:07:48.914+08:00 DEBUG 26510 --- [nio-8081-exec-3] s.w.s.m.m.a.RequestMappingHandlerMapping : Mapped to com.mizore.mob.controller.SseController#connect()
+2023-11-30T12:07:49.036+08:00  INFO 26510 --- [nio-8081-exec-3] com.mizore.mob.message.SseServer         : 创建新的sse连接，当前用户：staff:5
+2023-11-30T12:07:49.039+08:00 DEBUG 26510 --- [nio-8081-exec-3] o.s.w.c.request.async.WebAsyncManager    : Started async request
+2023-11-30T12:07:49.040+08:00 DEBUG 26510 --- [nio-8081-exec-3] o.s.web.servlet.DispatcherServlet        : Exiting but response remains open for further handling
+```
 在用户进入页面时（需要实时消息推送的页面），前端发起SSE连接，后端持有这个连接，存入容器，直到用户离开这个页面，前端发送撤销连接的请求，后端执行连接结束的回调函数清除连接。
 
-在用户停留在 SSE 页面时，SSE 连接保持。当目标事件发生，事件执行方需要遍历 SSE 连接容器中维持的连接，调用连接对象的发送消息方法，让后端将消息发送给前端。
+在用户停留在 SSE 页面时，SSE 连接保持。当目标事件发生，事件执行方需要遍历 SSE 连接容器中维持的连接，调用连接对象的发送消息方法，让后端将消息推送给前端。
+
+请求首部`accept:text/event-stream`，表示这个请求期望获取到服务器推送的数据(Server-sent events)。
+
+`text/event-stream` 是服务器推送数据的一种格式,它允许服务器通过 HTTP 协议持续向客户端推送数据,而不是由客户端发起请求获取。
+
+服务器对同一SSE请求的多次消息推送，实际上并没有多次发送http响应，而是一次持续时间较长的响应，在维护SSE连接期间，会有来自服务端的事件流通过这个未结束的响应持续
+推送到客户端，直到连接关闭，这次请求才算完成。
+
+![sse1](img/sse1.png)
+![sse2](img/sse2.png)
+
+连接关闭可以由服务端主动关闭也可以有客户端主动关闭（服务端推送“关闭SSE连接”的事件来通知客户端），较为灵活。
 
 ## 自定义注解 + SpringAOP + Redis 实现接口的幂等性
 

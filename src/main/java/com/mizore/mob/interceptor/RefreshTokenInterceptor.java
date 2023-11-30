@@ -72,10 +72,10 @@ public class RefreshTokenInterceptor implements HandlerInterceptor {
         map.put("role", claims.get("role"));
         // 检查是否需要刷新token
         Long expire = stringRedisTemplate.getExpire(tokenKey);      // 得到剩余时间
-        // token的redis缓存保质期是两天，在保质期还剩小于一天时重新颁发token。
+        // token的redis缓存保质期是2*ttl，在保质期还剩小于ttl时重新颁发token。
         // expire会在键是过期键时得到null,但经过上面对keyStr的判断，可以断言这里的expire不会为hull
         if (expire * 1000 <= JWT.TTL) { //统一单位为毫秒
-            // 剩余时间不足一天，需要自动续期，实际上是重新颁发新jwt
+            // 剩余时间不足ttl，需要自动续期，实际上是重新颁发新jwt
             String jwt = JWT.generateJWT(map);
             // 把新jwt放入
             stringRedisTemplate.opsForValue().set(LOGIN_TOKEN_PREFIX + jwt, JWT.getSecretKeyStr(), JWT.TTL * 2, TimeUnit.MILLISECONDS);
