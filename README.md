@@ -19,6 +19,7 @@
 用一次http请求/响应交互实现服务端主动消息推送，基于SpringMVC SseEmitter（底层使用异步请求），商家端的SSE连接请求在处理后不会立刻结束响应，响应仍处于open状态（这是由异步线程去保持的，web容器中的工作线程被归还），用户下单线程调用`sseEmitter.send(msg)`，在响应中
 写入消息，异步线程去做消息的推送。这比短轮询节省了大量的无效请求；比长轮询较少了请求数以及避免了长轮询两次轮询间消息丢失风险；相比WebSocket则对场景更适应（单向消息推送即可），并且实现更简单。
 
+下面是处理SSE连接请求的日志，`exec-3`及时退出，使用了异步处理：
 ```bash
 2023-11-30T12:07:48.913+08:00 DEBUG 26510 --- [nio-8081-exec-3] o.s.web.servlet.DispatcherServlet        : GET "/sse/connect?token=xxx", parameters={masked}
 2023-11-30T12:07:48.914+08:00 DEBUG 26510 --- [nio-8081-exec-3] s.w.s.m.m.a.RequestMappingHandlerMapping : Mapped to com.mizore.mob.controller.SseController#connect()
