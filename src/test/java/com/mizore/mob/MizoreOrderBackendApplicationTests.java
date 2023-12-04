@@ -30,18 +30,19 @@ class MizoreOrderBackendApplicationTests {
 				.globalConfig(builder -> {
 					builder.author("mizore") // 设置作者
 //                            .enableSwagger() // 开启 swagger 模式
-							.outputDir("/home/mizore/IdeaProjects/mizore-order/mizore-order-backend/src/main/java/"); // 指定输出目录
+							.outputDir("/home/mizore/IdeaProjects/YSF-backend/src/main/java/"); // 指定输出目录
 				})
 				.packageConfig(builder -> {
 					builder.parent("com.mizore.mob") // 设置父包名
 //                            .moduleName("model") // 设置父包模块名
-							.pathInfo(Collections.singletonMap(OutputFile.xml, "/home/mizore/IdeaProjects/mizore-order/mizore-order-backend/src/main/resources/mapper")); // 设置mapperXml生成路径
+							.pathInfo(Collections.singletonMap(OutputFile.xml, "/home/mizore/IdeaProjects/YSF-backend/src/main/resources/mapper")); // 设置mapperXml生成路径
 				})
 				.strategyConfig(builder -> {
 					builder.addInclude(
 //							"comment," +
 //									"dish," +
-									"order"
+//									"voucher," +
+									"voucher_order"
 //									"order_dish," +
 //									"user"
 					) // 设置需要生成的表名
@@ -150,6 +151,8 @@ class MizoreOrderBackendApplicationTests {
 		states.add((byte) 2);
 		System.out.println(orderMapper.testIn(new ArrayList<>(states)));
 	}
+
+
 }
 
 
