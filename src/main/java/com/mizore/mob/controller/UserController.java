@@ -5,14 +5,13 @@ import com.mizore.mob.dto.Result;
 import com.mizore.mob.dto.SignFromDTO;
 import com.mizore.mob.service.IUserService;
 import com.mizore.mob.util.UserHolder;
-import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.stereotype.Controller;
 
 /**
  * <p>
@@ -29,6 +28,7 @@ import org.springframework.stereotype.Controller;
 @Validated
 public class UserController {
 
+    @Autowired
     private IUserService userService;
     @PostMapping("/code")
     public Result sendCode(@Pattern(regexp = "^(13[0-9]|14[01456879]|15[0-35-9]|16[2567]|17[0-8]|18[0-9]|19[0-35-9])\\d{8}$")

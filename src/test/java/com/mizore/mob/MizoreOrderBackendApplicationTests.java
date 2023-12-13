@@ -13,13 +13,15 @@ import com.mizore.mob.service.impl.DishServiceImpl;
 import com.mizore.mob.util.BeanUtil;
 import com.mizore.mob.util.JWT;
 import io.jsonwebtoken.Claims;
+import io.netty.util.concurrent.DefaultThreadFactory;
+import io.netty.util.concurrent.RejectedExecutionHandlers;
 import jakarta.annotation.Resource;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.math.BigDecimal;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.*;
 
 @SpringBootTest
 class MizoreOrderBackendApplicationTests {
@@ -59,7 +61,17 @@ class MizoreOrderBackendApplicationTests {
 	@Test
 	void contextLoads() {
 	}
-
+	@Test
+	void testMod() {
+		for (int i = 0; i < 10; i++) {
+			Random r = new Random();
+//			int a = r.nextInt(1, 1000);
+			int a = 128;
+			int b = r.nextInt(1, 1000);
+			System.out.print("" + ((a - 1) & b )+ " ");
+			System.out.println(b % a);
+		}
+	}
 	@Test
 	void generateJwt() {
 		Hashtable<String, Object> map = new Hashtable<>();

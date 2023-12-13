@@ -94,7 +94,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     }
 
     private boolean checkPhoneAndCode(String phone, String code) {
-        String resCode = stringRedisTemplate.opsForValue().get(LOGIN_CODE_PREFIX + phone);
+        String resCode = stringRedisTemplate.opsForValue().get(LOGIN_CODE_KEY + phone);
         if (resCode != null && resCode.equals(code)) {
             // 验证码有效且验证码手机号一致
             stringRedisTemplate.delete(LOGIN_CODE_PREFIX + phone);  // 主动删除验证码

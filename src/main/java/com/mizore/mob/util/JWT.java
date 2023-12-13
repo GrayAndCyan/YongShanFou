@@ -17,6 +17,7 @@ public class JWT {
     public static String generateJWT(Map<String, Object> claims) {
         return  Jwts.builder()
                 .claims(claims)
+//                .expiration(new Date(1702697136000L))
                 .expiration(new Date(System.currentTimeMillis() + TTL))
                 .signWith(SECRET_KEY)
                 .compact();
